@@ -1,3 +1,3 @@
 Design PAtterns used - 
 
-![Uploading ATMcaseStudy.jpg…]()
+1. State Design Pattern
