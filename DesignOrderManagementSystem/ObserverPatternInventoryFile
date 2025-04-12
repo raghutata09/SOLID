@@ -1,0 +1,82 @@
+import java.util.*;
+
+// Observer Interface
+interface InventoryObserver {
+    void update(String product, int quantity);
+}
+
+// Subject
+class CentralInventory {
+    private Map<String, Integer> productStock = new HashMap<>();
+    private List<InventoryObserver> observers = new ArrayList<>();
+
+    public void addObserver(InventoryObserver observer) {
+        observers.add(observer);
+    }
+
+    public void removeObserver(InventoryObserver observer) {
+        observers.remove(observer);
+    }
+
+    public void addStock(String product, int quantity) {
+        productStock.put(product, productStock.getOrDefault(product, 0) + quantity);
+        System.out.println("CentralInventory: Added " + quantity + " units of " + product);
+        notifyObservers(product, quantity);
+    }
+
+    public void receiveStockRequest(String product, int quantity) {
+        System.out.println("CentralInventory: Received stock request for " + quantity + " units of " + product);
+        // Logic: Update stock, notify city, etc.
+        addStock(product, quantity);  // Simulating immediate addition
+    }
+
+    private void notifyObservers(String product, int quantity) {
+        for (InventoryObserver observer : observers) {
+            observer.update(product, quantity);
+        }
+    }
+}
+
+// Concrete Observer
+class CityInventory implements InventoryObserver {
+    private String cityName;
+    private CentralInventory centralInventory;
+
+    public CityInventory(String cityName, CentralInventory centralInventory) {
+        this.cityName = cityName;
+        this.centralInventory = centralInventory;
+    }
+
+    public void productSold(String product, int quantity) {
+        System.out.println(cityName + ": Sold " + quantity + " units of " + product);
+        // Logic to reduce local stock
+        // Notify central if running low
+        centralInventory.receiveStockRequest(product, quantity); // Simulating request
+    }
+
+    @Override
+    public void update(String product, int quantity) {
+        System.out.println(cityName + ": Received update -> " + quantity + " units of " + product + " added to central.");
+        // Logic to adjust or be aware of stock update
+    }
+}
+
+
+
+public class Main {
+    public static void main(String[] args) {
+        CentralInventory centralInventory = new CentralInventory();
+
+        CityInventory delhi = new CityInventory("Delhi", centralInventory);
+        CityInventory mumbai = new CityInventory("Mumbai", centralInventory);
+
+        centralInventory.addObserver(delhi);
+        centralInventory.addObserver(mumbai);
+
+        // Delhi sells some product
+        delhi.productSold("Laptop", 5);
+
+        // Central adds stock (after request)
+        centralInventory.addStock("Laptop", 20);
+    }
+}
