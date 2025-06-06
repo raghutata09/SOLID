@@ -1,0 +1,4 @@
+enum SpotType {
+    OCCUPIED,
+    AVAILABLE
+}
